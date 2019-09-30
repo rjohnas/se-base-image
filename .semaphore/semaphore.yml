@@ -1,0 +1,21 @@
+version: v1.0
+name: Docker build-tag-push
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Build
+    task:
+      jobs:
+        - name: Docker Hub
+          commands:
+            - checkout
+            - echo $DOCKERHUB_PASSWORD | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            - echo "Docker build ${SEMAPHORE_PROJECT_NAME}..."
+            - docker build -t ${SEMAPHORE_PROJECT_NAME} .
+            - docker tag ${SEMAPHORE_PROJECT_NAME} ${DOCKERHUB_USERNAME}/${SEMAPHORE_PROJECT_NAME}
+            - echo "Done building $SEMAPHORE_PROJECT_NAME"
+
+      secrets:
+        - name: dockerhub
